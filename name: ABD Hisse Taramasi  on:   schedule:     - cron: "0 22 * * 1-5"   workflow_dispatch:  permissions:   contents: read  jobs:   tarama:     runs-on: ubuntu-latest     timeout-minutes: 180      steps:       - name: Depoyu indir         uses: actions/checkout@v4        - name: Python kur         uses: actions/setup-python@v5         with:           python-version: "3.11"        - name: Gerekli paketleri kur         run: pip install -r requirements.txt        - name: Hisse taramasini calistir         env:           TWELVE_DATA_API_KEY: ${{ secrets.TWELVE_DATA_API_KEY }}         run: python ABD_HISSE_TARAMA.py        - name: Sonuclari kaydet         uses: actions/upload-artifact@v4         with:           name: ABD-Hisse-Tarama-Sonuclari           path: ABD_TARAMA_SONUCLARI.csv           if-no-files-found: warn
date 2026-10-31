@@ -1,0 +1,38 @@
+name: ABD Hisse Taramasi
+
+on:
+  schedule:
+    - cron: "0 22 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tarama:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Depoyu indir
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Paketleri kur
+        run: pip install -r requirements.txt
+
+      - name: Hisse taramasini calistir
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python ABD_HISSE_TARAMA.py
+
+      - name: Sonuclari kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: ABD-Hisse-Tarama-Sonuclari
+          path: ABD_TARAMA_SONUCLARI.csv
+          if-no-files-found: warn
